@@ -1,3 +1,7 @@
+import numpy as np
+import pandas as pd
+
+
 class StrategyCalculator:
     def __init__(self, calSettings):
         self.calSettings = calSettings

@@ -1,7 +1,14 @@
 import time
 from collections import OrderedDict
 from Logic import *
-
+from StrategySettings import StrategySettings
+from StrategyLogic import StrategyLogic
+from StrategyData import StrategyData
+from StrategyCalculator import StrategyCalculator
+from StrategyOutput import StrategyOutput
+import os, sys
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 def defaultSettings(settings):
@@ -174,18 +181,13 @@ class Strategy:
             print("Backtesting in progress ...")
         if num_core == 0:
             num_cores = max(multiprocessing.cpu_count() - 1, 1)
-        # num_cores = 6
 
         results = Parallel(n_jobs=num_cores, verbose=11)(delayed(self.evalStratDay)(date) for date in self.strategyData.tradeDateRange)
         results = [result for result in results if result is not None]
         
         results = [item for sublist in results for item in sublist]
-        # print(results[0])
-        # results = pd.concat(results)
 
         self.strategyCalculator.positionList = results
-#        for date in self.strategyData.tradeDateRange:
-#            self.evalStratDay(date)
     
     def outputGraphsParallel(self, silence = False, num_core = 0):
         # produce graph for every day defined

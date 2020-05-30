@@ -1,5 +1,7 @@
 import time
 from collections import OrderedDict
+from Logic import *
+
 
 
 def defaultSettings(settings):

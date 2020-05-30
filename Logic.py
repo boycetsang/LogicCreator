@@ -170,11 +170,7 @@ class BasicLogic(Logic):
                 if val > position.openPosition + realTakeProfit:
                     tst = strategy.strategyData.timeSeriesTick
                     if tst[tst < position.openPosition + realTakeProfit].shape[0] > 0:
-                        tst = tst[
-                            tst[tst < position.openPosition + realTakeProfit].index[
-                                -1
-                            ] :
-                        ]
+                        tst = tst[tst[tst < position.openPosition + realTakeProfit].index[-1], :]
                         tst_max = tst.max()
                         if tst_max - val < self.trailing:
                             return False
@@ -655,3 +651,77 @@ class StdLogic(Logic):
         ax.set_ylabel("rolling std")
         ax.axhline(self.filterEnd, color="k", linestyle="--", lw=2, alpha=0.2)
         ax.axhline(self.filterStart, color="k", linestyle="--", lw=2, alpha=0.2)
+
+class MALogic(Logic):
+    ''' Logic to capture moving average corssing behavior in time series.
+        This Logic does not execute short positions
+        
+        Parameters
+        -----
+        fast_period: int
+            time window which OLS regression is performed (in seconds)
+        slow_period: int
+            time window which moving average of beta time series is calculated (in seconds)
+        delta_thres: float
+            minimum amount of excess flip to trigger entance execution
+        wait_period: int
+            time window in which the MA flip has to occur to trigger execution
+        resample_period: int
+            time window to interpolate for missing values. This value cannot be samller than any of above.
+    '''
+    SELL_EXIT_LOGIC_OPERATION = "or"
+    BUY_EXIT_LOGIC_OPERATION = "or"
+    def __init__(self, 
+                 fast_period=480, 
+                 slow_period=180,
+                 delta_thres=0,
+                 wait_period=20,
+                 resample_period=5):
+        self.fast_period = fast_period
+        self.slow_period = slow_period
+        self.delta_thres = delta_thres
+        self.wait_period = wait_period
+        self.resample_period = resample_period
+
+    def addEntranceReport(self, strategy, position):
+        position.ewma = self.ewma
+        position.ewmaLong = self.ewmaLong
+
+    def computeForDay(self, strategy, timeSeriesTick, timeSeriesTrade):
+        timeSeriesReg = timeSeriesTick.resample(str(int(self.resample_period))+'S').first()
+        timeSeriesReg = timeSeriesReg.fillna(method='pad')
+        timeTable = timeSeriesReg.to_frame()
+        # timeTable = timeSeriesReg
+        timeTable['second'] = timeSeriesReg.index.astype(np.int64)
+        timeTable['second'] = (timeTable['second'] - timeTable['second'][0])/math.pow(10,9)
+
+        self.ewmaSeries = timeSeriesReg.ewm( span = self.fast_period/self.resample_period).mean().rename('ewma')
+        self.ewmaLongSeries = timeSeriesReg.ewm( span = self.slow_period/self.resample_period).mean().rename('ewmaLong')
+        self.ewma = self.ewmaSeries.iloc[-1]
+        self.ewmaLong = self.ewmaLongSeries.iloc[-1]
+        return {'ewmaSeries': self.ewmaSeries , 'ewmaLongSeries': self.ewmaLongSeries }
+
+    def addBuyExitCondition(self, strategy, position, ind):
+        wait_ind = (self.ewmaSeries.index < ind + pd.Timedelta(self.wait_period, unit='s')) & (self.ewmaSeries.index >= ind)
+        if (self.ewmaSeries - self.ewmaLongSeries)[wait_ind].max() < 0  and ((self.ewmaSeries - self.ewmaLongSeries)[wait_ind].argmin() == (len((self.ewmaSeries - self.ewmaLongSeries)[wait_ind]) - 1)):
+            return True
+        else:
+            return False       
+
+    def addSellExitCondition(self, strategy, position, ind):
+        return False  
+            
+    def addBuyEntranceCondition(self, strategy, ind):
+        wait_ind = (self.ewmaSeries.index < ind + pd.Timedelta(self.wait_period, unit='s')) & (self.ewmaSeries.index >= ind)
+        if (self.ewmaSeries - self.ewmaLongSeries)[wait_ind].min() > self.delta_thres:
+            return True
+        else:
+            return False 
+        
+    def addSellEntranceCondition(self, strategy, ind):
+        return False
+    
+    def printOnSecondAxis(self, ax):
+       ax.plot(self.ewmaSeries.index, self.ewmaSeries, color = 'b', alpha = 0.7, label='ewma')
+       ax.plot(self.ewmaLongSeries.index, self.ewmaLongSeries, color = 'r', alpha = 0.7, label='ewmaLong')
+

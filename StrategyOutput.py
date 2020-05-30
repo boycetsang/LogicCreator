@@ -66,7 +66,7 @@ class StrategyOutput:
             )
         )
 
-    def outputGraphs(self, strategy, dates=[]):
+    def outputGraphs(self, strategy, dates=[], realtime=False):
         import matplotlib.dates as mdates
 
         if dates == [] and self.outputSettings["graphOutput"]:
@@ -199,10 +199,14 @@ class StrategyOutput:
                 xfmt = mdates.DateFormatter("%H:%M")
                 plt.gca().xaxis.set_major_formatter(xfmt)
                 plt.savefig(graphPath, dpi=300)
+                if realtime:
+                    plt.show(block=False)
+                    plt.pause(4)
+                    plt.close()
                 plt.clf()
             print("Finished writing graphs to " + self.outputSettings["graphOutput"])
 
-    def outputGraphsDay(self, strategy, date):
+    def outputGraphsDay(self, strategy, date, realtime=False):
         import matplotlib.dates as mdates
 
         if self.outputSettings["graphOutput"]:
@@ -329,6 +333,10 @@ class StrategyOutput:
             xfmt = mdates.DateFormatter("%H:%M")
             plt.gca().xaxis.set_major_formatter(xfmt)
             plt.savefig(graphPath, dpi=300)
+            if realtime:
+                plt.show(block=False)
+                plt.pause(4)
+                plt.close()
             plt.clf()
 
     def getPnL(self, strategy):

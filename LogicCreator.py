@@ -11,26 +11,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def defaultSettings(settings):
-    settings["timezoneInIndex"] = "UTC"
-    settings["timezoneInRecord"] = "GMT"
-    settings["indexStartTime"] = "11:45:00"
-    settings["indexEndTime"] = "20:00:00"
-    settings["tradeStartTime"] = "11:45:00"
-    settings["tradeEndTime"] = "20:00:00"
-    settings["lunchStartTime"] = "11:55:00"
-    settings["lunchEndTime"] = "11:55:00"
-    settings["interval"] = 1
-    settings["slippery"] = 0.5
-
-    settings["dataPath"] = r"/mnt/c/Users/Boyce/PythonProject/LogicCreator/data"
-    settings["dateStart"] = "20190422"
-    settings["dateEnd"] = "20190424"
-
-    settings["graphOutput"] = "graph_output"
-    settings["summaryOutput"] = "Summary.csv"
-
-    return settings
 
 
 class Strategy:
@@ -68,7 +48,6 @@ class Strategy:
             self.strategySettings.settings["timezoneInRecord"]
         )
         timeSeries = timeSeries.price
-
 
         timeSeries.name = "price"
         self.indexStartTime = (
@@ -305,6 +284,26 @@ class Strategy:
         )
         return self
 
+def defaultSettings(settings):
+    settings["timezoneInIndex"] = "UTC"
+    settings["timezoneInRecord"] = "GMT"
+    settings["indexStartTime"] = "11:45:00"
+    settings["indexEndTime"] = "20:00:00"
+    settings["tradeStartTime"] = "11:45:00"
+    settings["tradeEndTime"] = "20:00:00"
+    settings["lunchStartTime"] = "11:55:00"
+    settings["lunchEndTime"] = "11:55:00"
+    settings["interval"] = 1
+    settings["slippery"] = 0.2
+
+    settings["dataPath"] = r"/mnt/c/Users/Boyce/PythonProject/LogicCreator/data"
+    settings["dateStart"] = "20190422"
+    settings["dateEnd"] = "20200424"
+
+    settings["graphOutput"] = "graph_output"
+    settings["summaryOutput"] = "Summary.csv"
+
+    return settings
 
 if __name__ == "__main__":
     start = time.time()
@@ -345,22 +344,27 @@ if __name__ == "__main__":
     #    logicSettings[PnLLogic] = {}
 
     logicSettings[BasicLogic] = dict(
-        takeProfit=7.65, stopLoss=7.65, totalExposure=10, trailing=0
+        takeProfit=0.02, stopLoss=0.02, totalExposure=10, trailing=0
     )
-    logicSettings[RegLogic] = dict(
-        period=475,
-        delta_period=15,
-        beta_threshold=0.0005,
-        resamplePeriod=5,
-        filter_type="momentum",
-    )
-    logicSettings[RSILogic] = dict(
-        filterStart=10,
-        filterEnd=52,
-        filterWindow=372,
-        # windowType = None,
-        reverse=False,
-    )
+    # logicSettings[RegLogic] = dict(
+    #     period=475,
+    #     delta_period=15,
+    #     beta_threshold=0.0005,
+    #     resamplePeriod=5,
+    #     filter_type="momentum",
+    # )
+    # logicSettings[RSILogic] = dict(
+    #     filterStart=10,
+    #     filterEnd=52,
+    #     filterWindow=372,
+    #     # windowType = None,
+    #     reverse=False,
+    # )
+    logicSettings[MALogic] = dict(fast_period=30, 
+                                  slow_period=120,
+                                  wait_period=15,
+                                  delta_thres=0.5,
+                                  resample_period=5)
     logicSettings[DayEndLogic] = dict(minsToForceExit=11.25)
 
     calSettings["slippery"] = settings["slippery"]
@@ -384,8 +388,8 @@ if __name__ == "__main__":
 
     print("Real PnL for the strategy is: ", realPnL)
 
-    # strategy.strategyOutput.outputGraphs(strategy)
-    strategy.outputGraphsParallel()
+    strategy.strategyOutput.outputGraphs(strategy)
+    # strategy.outputGraphsParallel()
 
     print(
         "Benchmark Time from "

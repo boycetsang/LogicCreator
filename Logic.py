@@ -7,39 +7,51 @@ from statsmodels.tools import add_constant
 
 
 class Logic(object):
-    ''' Base Logic Object, sets up default behaviour for all Logic children '''
+    """ Base Logic Object, sets up default behaviour for all Logic children """
+
     # Four boolean operations when appended with other logics
     # General recommendation is, if this logic is sufficient, then use 'or'. Otherwise, if condition is necessary, use 'and'
-    BUY_ENTRANCE_LOGIC_OPERATION = 'and'
-    SELL_ENTRANCE_LOGIC_OPERATION = 'and'
-    BUY_EXIT_LOGIC_OPERATION = 'and'
-    SELL_EXIT_LOGIC_OPERATION = 'and'    
+    BUY_ENTRANCE_LOGIC_OPERATION = "and"
+    SELL_ENTRANCE_LOGIC_OPERATION = "and"
+    BUY_EXIT_LOGIC_OPERATION = "and"
+    SELL_EXIT_LOGIC_OPERATION = "and"
+
     def __init__(self):
-        pass        
+        pass
+
     def addEntranceReport(self, strategy, position):
         return position
+
     def addExitReport(self, strategy, position):
-        return position    
+        return position
+
     # Codes to determine condition for trades, if the function returns True it means such trade is allowed.
     def addBuyEntranceCondition(self, strategy, ind):
         return True
+
     def addBuyExitCondition(self, strategy, position, ind):
         return True
+
     def addSellEntranceCondition(self, strategy, ind):
         return True
+
     def addSellExitCondition(self, strategy, position, ind):
         return True
+
     # This code execute once for each day before iteration on time
     def computeForDay(self, strategy, timeSeriesTick, timeSeriesTrade):
         return {}
+
     def computeForAction(self, strategy, ind, val):
         return {}
+
     # This code is used when producing graphical output
     def printOnSecondAxis(self, ax):
         return None
 
+
 class DayEndLogic(Logic):
-    ''' Day End Logic, approaching end of day strategy should try to close positions
+    """ Day End Logic, approaching end of day strategy should try to close positions
         This Logic class should be placed towards the end of logic chain.
 
         Parameters
@@ -47,33 +59,46 @@ class DayEndLogic(Logic):
         minToForceExit: int
             Time before tradeEndTime to force exit (in mins).
 
-    '''
-    SELL_EXIT_LOGIC_OPERATION = 'or'
-    BUY_EXIT_LOGIC_OPERATION = 'or'
-    def __init__(self, minsToForceExit = 30):
+    """
+
+    SELL_EXIT_LOGIC_OPERATION = "or"
+    BUY_EXIT_LOGIC_OPERATION = "or"
+
+    def __init__(self, minsToForceExit=30):
         self.minsToForceExit = minsToForceExit
         self.timeToForceExit = None
-    
+
     def addSellExitCondition(self, strategy, position, ind):
-        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(minutes=self.minsToForceExit)
+        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
+            minutes=self.minsToForceExit
+        )
         if ind.time() >= self.timeToForceExit.time():
             return True
         else:
             return False
+
     def addBuyExitCondition(self, strategy, position, ind):
-        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(minutes=self.minsToForceExit)
+        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
+            minutes=self.minsToForceExit
+        )
         if ind.time() >= self.timeToForceExit.time():
             return True
         else:
             return False
+
     def addSellEntranceCondition(self, strategy, ind):
-        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(minutes=self.minsToForceExit)
+        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
+            minutes=self.minsToForceExit
+        )
         if ind.time() >= self.timeToForceExit.time():
             return False
         else:
             return True
+
     def addBuyEntranceCondition(self, strategy, ind):
-        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(minutes=self.minsToForceExit)
+        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
+            minutes=self.minsToForceExit
+        )
         if ind.time() >= self.timeToForceExit.time():
             return False
         else:
@@ -81,7 +106,7 @@ class DayEndLogic(Logic):
 
 
 class BasicLogic(Logic):
-    ''' Standard Logic, controlling profit, loss and exposure
+    """ Standard Logic, controlling profit, loss and exposure
         
         Parameters
         -----
@@ -100,71 +125,97 @@ class BasicLogic(Logic):
         -----
         totalExposure: int
             number of concurrent trades before this trade started.
-    '''
-    def __init__(self, takeProfit = 80, stopLoss = 40, totalExposure = 10, trailing = 0):
+    """
+
+    def __init__(self, takeProfit=80, stopLoss=40, totalExposure=10, trailing=0):
         self.takeProfit = takeProfit
         self.stopLoss = stopLoss
         self.totalExposure = totalExposure
         self.trailing = trailing
         self.currentExposure = np.nan
+
     def addEntranceReport(self, strategy, position):
         position.totalExposure = self.currentExposure
         return position
+
     def addBuyEntranceCondition(self, strategy, ind):
         # Determine if exposure is too large
-        if (strategy.strategyCalculator.buyCnt + strategy.strategyCalculator.sellCnt <= self.totalExposure):
-            self.currentExposure = strategy.strategyCalculator.buyCnt + strategy.strategyCalculator.sellCnt
+        if (
+            strategy.strategyCalculator.buyCnt + strategy.strategyCalculator.sellCnt
+            <= self.totalExposure
+        ):
+            self.currentExposure = (
+                strategy.strategyCalculator.buyCnt + strategy.strategyCalculator.sellCnt
+            )
             return True
         else:
             return False
+
     def addBuyExitCondition(self, strategy, position, ind):
         val = strategy.strategyData.timeSeriesTrade[ind]
         if self.takeProfit < 1:
             realTakeProfit = self.takeProfit * position.openPosition
         else:
-            realTakeProfit = self.takeProfit 
-        if self.stopLoss  < 1:
+            realTakeProfit = self.takeProfit
+        if self.stopLoss < 1:
             realStopLoss = self.stopLoss * position.openPosition
         else:
             realStopLoss = self.stopLoss
         # Determine if price is outside range
-        if val > position.openPosition + realTakeProfit or val < position.openPosition - realStopLoss:
+        if (
+            val > position.openPosition + realTakeProfit
+            or val < position.openPosition - realStopLoss
+        ):
             if self.trailing > 0:
-                if val > position.openPosition + realTakeProfit :
+                if val > position.openPosition + realTakeProfit:
                     tst = strategy.strategyData.timeSeriesTick
                     if tst[tst < position.openPosition + realTakeProfit].shape[0] > 0:
-                        tst = tst[tst[tst < position.openPosition + realTakeProfit].index[-1]:]
+                        tst = tst[
+                            tst[tst < position.openPosition + realTakeProfit].index[
+                                -1
+                            ] :
+                        ]
                         tst_max = tst.max()
                         if tst_max - val < self.trailing:
                             return False
             return True
         else:
             return False
-        
+
     def addSellEntranceCondition(self, strategy, ind):
         # Determine if exposure is outside range
-        if (strategy.strategyCalculator.buyCnt + strategy.strategyCalculator.sellCnt <= self.totalExposure):
-            self.currentExposure = strategy.strategyCalculator.buyCnt + strategy.strategyCalculator.sellCnt
+        if (
+            strategy.strategyCalculator.buyCnt + strategy.strategyCalculator.sellCnt
+            <= self.totalExposure
+        ):
+            self.currentExposure = (
+                strategy.strategyCalculator.buyCnt + strategy.strategyCalculator.sellCnt
+            )
             return True
         else:
             return False
-        
+
     def addSellExitCondition(self, strategy, position, ind):
         if self.takeProfit < 1:
             realTakeProfit = self.takeProfit * position.openPosition
         else:
-            realTakeProfit = self.takeProfit 
-        if self.stopLoss  < 1:
+            realTakeProfit = self.takeProfit
+        if self.stopLoss < 1:
             realStopLoss = self.stopLoss * position.openPosition
         else:
             realStopLoss = self.stopLoss
-    
+
         val = strategy.strategyData.timeSeriesTrade[ind]
-        if val < position.openPosition - realTakeProfit or val > position.openPosition + realStopLoss:
+        if (
+            val < position.openPosition - realTakeProfit
+            or val > position.openPosition + realStopLoss
+        ):
             if self.trailing > 0:
-                if val < position.openPosition - realTakeProfit :
+                if val < position.openPosition - realTakeProfit:
                     tst = strategy.strategyData.timeSeriesTick
-                    tst = tst[tst[tst > position.openPosition - realTakeProfit].index[-1]:]
+                    tst = tst[
+                        tst[tst > position.openPosition - realTakeProfit].index[-1] :
+                    ]
                     tst_min = tst.min()
                     if -tst_min + val < self.trailing:
                         return False
@@ -174,7 +225,7 @@ class BasicLogic(Logic):
 
 
 class RSILogic(Logic):
-    def __init__(self, filterStart = 10, filterEnd = 60, filterWindow = 30, reverse = False):
+    def __init__(self, filterStart=10, filterEnd=60, filterWindow=30, reverse=False):
         self.filterStart = filterStart
         self.filterEnd = filterEnd
         self.filterWindow = filterWindow
@@ -183,20 +234,23 @@ class RSILogic(Logic):
         self.reverse = reverse
         self.lastRSI = 0
         self.movement = None
-        pass        
+        pass
+
     def addEntranceReport(self, strategy, position):
         position.rsi = self.lastRSI
-        position.movement = self.movement 
+        position.movement = self.movement
         return position
+
     def addExitReport(self, strategy, position):
-        return position    
+        return position
+
     # Codes to determine condition for trades, if the function returns True it means such trade is allowed.
     def addBuyEntranceCondition(self, strategy, ind):
         RSICondition = False
         if any(self.RSISeries.index < ind):
             lastRSI = self.RSISeries[self.RSISeries.index < ind][-1]
             self.lastRSI = lastRSI
-            RSICondition =  (lastRSI > self.filterEnd)
+            RSICondition = lastRSI > self.filterEnd
             if self.reverse:
                 RSICondition = not RSICondition
         return RSICondition
@@ -206,7 +260,7 @@ class RSILogic(Logic):
         if any(self.RSISeries.index < ind):
             lastRSI = self.RSISeries[self.RSISeries.index < ind][-1]
             self.lastRSI = lastRSI
-            RSICondition = (lastRSI < self.filterStart) 
+            RSICondition = lastRSI < self.filterStart
 
             if self.reverse:
                 RSICondition = not RSICondition
@@ -214,13 +268,15 @@ class RSILogic(Logic):
 
     # This code execute once for each day before iteration on time
     def computeForDay(self, strategy, timeSeriesTick, timeSeriesTrade):
-        window = self.filterWindow/float(strategy.strategySettings.settings['interval'])
+        window = self.filterWindow / float(
+            strategy.strategySettings.settings["interval"]
+        )
         # self.RSISeries = timeSeriesTick.rolling(window, win_type = self.windowType).std()
         close = timeSeriesTick
         delta = close.diff()
-        # Get rid of the first row, which is NaN since it did not have a previous 
+        # Get rid of the first row, which is NaN since it did not have a previous
         # row to calculate the differences
-        delta = delta[1:] 
+        delta = delta[1:]
 
         # Make the positive gains (up) and negative gains (down) Series
         up, down = delta.copy(), delta.copy()
@@ -236,20 +292,21 @@ class RSILogic(Logic):
         RS1 = roll_up1 / roll_down1
         self.RSISeries = 100.0 - (100.0 / (1.0 + RS1))
         self.RSISeries = self.RSISeries[100:]
-        return {'RSISeries': self.RSISeries}
+        return {"RSISeries": self.RSISeries}
 
     def computeForAction(self, strategy, ind, val):
         return {}
+
     # This code is used when producing graphical output
     def printOnSecondAxis(self, ax):
-        ax.plot(self.RSISeries.index, self.RSISeries, color = 'b', alpha = 0.7, label='rsi')
-        ax.set_ylabel('rsi')
-        ax.axhline(self.filterEnd, color='k', linestyle='--', lw=1, alpha = 0.2)
-        ax.axhline(self.filterStart, color='k', linestyle='--', lw=1, alpha = 0.2)
+        ax.plot(self.RSISeries.index, self.RSISeries, color="b", alpha=0.7, label="rsi")
+        ax.set_ylabel("rsi")
+        ax.axhline(self.filterEnd, color="k", linestyle="--", lw=1, alpha=0.2)
+        ax.axhline(self.filterStart, color="k", linestyle="--", lw=1, alpha=0.2)
 
 
 class RegLogic(Logic):
-    ''' Trade filter using OLS regression
+    """ Trade filter using OLS regression
 
         Parameter
         -----
@@ -271,64 +328,330 @@ class RegLogic(Logic):
         delta: float
             value of diff of OLS when trade started
         
-    '''
-    def __init__(self, period = 600, delta_period = 15, beta_threshold = 0.03, resamplePeriod = 5, filter_type = 'momentum'):
+    """
+
+    def __init__(
+        self,
+        period=600,
+        delta_period=15,
+        beta_threshold=0.03,
+        resamplePeriod=5,
+        filter_type="momentum",
+    ):
         self.period = period
         self.delta_period = delta_period
-        self.beta_threshold = beta_threshold  
+        self.beta_threshold = beta_threshold
         self.resamplePeriod = resamplePeriod
         self.filter_type = filter_type
         self.betaSeries = None
         self.beta = None
         self.delta = None
-        
+
     def addEntranceReport(self, strategy, position):
         position.beta = self.beta
         position.delta = self.delta
-        return position      
-        
+        return position
+
     def computeForDay(self, strategy, timeSeriesTick, timeSeriesTrade):
-        timeSeriesReg = timeSeriesTick.resample(str(int(self.resamplePeriod))+'S').first()
-        timeSeriesReg = timeSeriesReg.fillna(method='pad')
+        timeSeriesReg = timeSeriesTick.resample(
+            str(int(self.resamplePeriod)) + "S"
+        ).first()
+        timeSeriesReg = timeSeriesReg.fillna(method="pad")
         timeTable = timeSeriesReg.to_frame()
-        timeTable['second'] = timeSeriesReg.index.astype(np.int64)
-        timeTable['second'] = (timeTable['second'] - timeTable['second'][0])/math.pow(10,9)
+        timeTable["second"] = timeSeriesReg.index.astype(np.int64)
+        timeTable["second"] = (timeTable["second"] - timeTable["second"][0]) / math.pow(
+            10, 9
+        )
 
         # self.betaSeries = pd.stats.ols.MovingOLS(y=timeTable['price'], x=timeTable['second'], window_type='rolling', window = self.period, intercept=True).beta
-        mod = RollingOLS(timeTable['price'], add_constant(timeTable['second'], prepend=False), window=self.period)
+        mod = RollingOLS(
+            timeTable["price"],
+            add_constant(timeTable["second"], prepend=False),
+            window=self.period,
+        )
         self.betaSeries = mod.fit().params
-        return {'betaSeries': self.betaSeries}
-    
+        return {"betaSeries": self.betaSeries}
+
     def addBuyEntranceCondition(self, strategy, ind):
         if any(self.betaSeries.index < ind):
             self.beta = self.betaSeries.second[self.betaSeries.index < ind][-1]
-            self.delta = self.betaSeries.second.diff(periods = self.delta_period)[-1]
-            if self.filter_type == 'bounce':
-                slopeCondition = self.betaSeries.second[self.betaSeries.index < ind][-1] < -self.beta_threshold
+            self.delta = self.betaSeries.second.diff(periods=self.delta_period)[-1]
+            if self.filter_type == "bounce":
+                slopeCondition = (
+                    self.betaSeries.second[self.betaSeries.index < ind][-1]
+                    < -self.beta_threshold
+                )
             else:
-                slopeCondition = self.betaSeries.second[self.betaSeries.index < ind][-1] > self.beta_threshold
-            deltaCondition = self.betaSeries.second.diff(periods = self.delta_period)[-1] >= 0
+                slopeCondition = (
+                    self.betaSeries.second[self.betaSeries.index < ind][-1]
+                    > self.beta_threshold
+                )
+            deltaCondition = (
+                self.betaSeries.second.diff(periods=self.delta_period)[-1] >= 0
+            )
             if slopeCondition and deltaCondition:
                 return True
             else:
                 return False
-        
+
     def addSellEntranceCondition(self, strategy, ind):
         return False
         if any(self.betaSeries.index < ind):
-            if self.filter_type == 'bounce':
-                slopeCondition = self.betaSeries.second[self.betaSeries.index < ind][-1] > self.beta_threshold
+            if self.filter_type == "bounce":
+                slopeCondition = (
+                    self.betaSeries.second[self.betaSeries.index < ind][-1]
+                    > self.beta_threshold
+                )
             else:
-                slopeCondition = self.betaSeries.second[self.betaSeries.index < ind][-1] < -self.beta_threshold
-            deltaCondition = self.betaSeries.second.diff(periods = self.delta_period)[-1] <= 0
+                slopeCondition = (
+                    self.betaSeries.second[self.betaSeries.index < ind][-1]
+                    < -self.beta_threshold
+                )
+            deltaCondition = (
+                self.betaSeries.second.diff(periods=self.delta_period)[-1] <= 0
+            )
             if slopeCondition and deltaCondition:
                 return True
             else:
                 return False
+
     def printOnSecondAxis(self, ax):
-        ax.plot(self.betaSeries.index, self.betaSeries.second, color = 'k', alpha = 0.7, label='beta')
-        ax.set_ylabel('regressed slope (pt/sec)')
-        ax.axhline(self.beta_threshold, color='k', linestyle='--', lw=1, alpha = 0.2)
-        ax.axhline(-self.beta_threshold, color='k', linestyle='--', lw=1, alpha = 0.2)
-        ax.fill_between(self.betaSeries.index, self.beta_threshold, self.betaSeries.second,  where= self.betaSeries.second >= self.beta_threshold, alpha = 0.2)
-        ax.fill_between(self.betaSeries.index, -self.beta_threshold, self.betaSeries.second, where= self.betaSeries.second <= - self.beta_threshold, alpha = 0.2)
+        ax.plot(
+            self.betaSeries.index,
+            self.betaSeries.second,
+            color="k",
+            alpha=0.7,
+            label="beta",
+        )
+        ax.set_ylabel("regressed slope (pt/sec)")
+        ax.axhline(self.beta_threshold, color="k", linestyle="--", lw=1, alpha=0.2)
+        ax.axhline(-self.beta_threshold, color="k", linestyle="--", lw=1, alpha=0.2)
+        ax.fill_between(
+            self.betaSeries.index,
+            self.beta_threshold,
+            self.betaSeries.second,
+            where=self.betaSeries.second >= self.beta_threshold,
+            alpha=0.2,
+        )
+        ax.fill_between(
+            self.betaSeries.index,
+            -self.beta_threshold,
+            self.betaSeries.second,
+            where=self.betaSeries.second <= -self.beta_threshold,
+            alpha=0.2,
+        )
+
+
+class VelLogic(Logic):
+    def __init__(self, period=40, threshold=0.03):
+        self.period = period
+        self.threshold = threshold
+        self.velocity = np.nan
+        self.movement = None
+
+    def addEntranceReport(self, strategy, position):
+        position.velocity = self.velocity
+        position.movement = self.movement
+        return position
+
+    def addBuyEntranceCondition(self, strategy, ind):
+        tickInd = strategy.strategyData.timeSeriesTick.index
+        timeToComputeVel = tickInd[tickInd < (ind - pd.Timedelta(seconds=self.period))]
+        if len(timeToComputeVel) != 0:
+            timeToComputeVel = timeToComputeVel[-1]
+            self.velocity = (
+                strategy.strategyData.timeSeriesTrade[ind]
+                - strategy.strategyData.timeSeriesTick[timeToComputeVel]
+            ) / (ind - timeToComputeVel).total_seconds()
+            slopeCondition = self.velocity > self.threshold
+        else:
+            slopeCondition = False
+        return slopeCondition
+
+    def addSellEntranceCondition(self, strategy, ind):
+        tickInd = strategy.strategyData.timeSeriesTick.index
+        timeToComputeVel = tickInd[tickInd < (ind - pd.Timedelta(seconds=self.period))]
+        if len(timeToComputeVel) != 0:
+            timeToComputeVel = timeToComputeVel[-1]
+            self.velocity = (
+                strategy.strategyData.timeSeriesTrade[ind]
+                - strategy.strategyData.timeSeriesTick[timeToComputeVel]
+            ) / (ind - timeToComputeVel).total_seconds()
+            slopeCondition = self.velocity < -self.threshold
+        else:
+            slopeCondition = False
+        return slopeCondition
+
+
+class PnLLogic(Logic):
+    SELL_EXIT_LOGIC_OPERATION = "or"
+    BUY_EXIT_LOGIC_OPERATION = "or"
+
+    def __init__(self, maxPnL=10000, minPnL=-10000):
+        self.maxPnL = maxPnL
+        self.minPnL = minPnL
+        self.closedDates = []
+        self.minPnLInThisDay = 0
+        self.maxPnLInThisDay = 0
+        pass
+
+    def addEntranceReport(self, strategy, position):
+        position.minPnLInThisDayWhenOpen = self.minPnLInThisDay
+        position.maxPnLInThisDayWhenOpen = self.maxPnLInThisDay
+        return position
+
+    def addExitReport(self, strategy, position):
+        ts = strategy.strategyData.timeSeriesTick
+        if position.type == "buy":
+            position.minPnLWithinTrade = (
+                ts[(ts.index <= position.closeTime) & (ts.index >= position.openTime)]
+                - position.openPosition
+            ).min()
+            position.maxPnLWithinTrade = (
+                ts[(ts.index <= position.closeTime) & (ts.index >= position.openTime)]
+                - position.openPosition
+            ).max()
+        elif position.type == "sell":
+            position.minPnLWithinTrade = -(
+                ts[(ts.index <= position.closeTime) & (ts.index >= position.openTime)]
+                - position.openPosition
+            ).max()
+            position.maxPnLWithinTrade = -(
+                ts[(ts.index <= position.closeTime) & (ts.index >= position.openTime)]
+                - position.openPosition
+            ).min()
+        return position
+
+    # Codes to determine condition for trades, if the function returns True it means such trade is allowed.
+    def addBuyEntranceCondition(self, strategy, ind):
+        if ind.date() in self.closedDates:
+            return False
+        else:
+            return True
+
+    def addBuyExitCondition(self, strategy, position, ind):
+        if ind.date() in self.closedDates:
+            return True
+        else:
+            return False
+
+    def addSellEntranceCondition(self, strategy, ind):
+        if ind.date() in self.closedDates:
+            return False
+        else:
+            return True
+
+    def addSellExitCondition(self, strategy, position, ind):
+        if ind.date() in self.closedDates:
+            return True
+        else:
+            return False
+
+    # This code execute once for each day before iteration on time
+    def computeForDay(self, strategy, timeSeriesTick, timeSeriesTrade):
+        self.minPnLInThisDay = 0
+        self.maxPnLInThisDay = 0
+        return {}
+
+    def computeForAction(self, strategy, ind, val):
+        cumPnL = 0
+        if not ind.date() in self.closedDates:
+            if strategy.strategyCalculator.positionList:
+                pnlList = [
+                    position.PnL
+                    for position in strategy.strategyCalculator.positionList
+                    if position.openTime.date() == ind.date()
+                ]
+            else:
+                pnlList = []
+            cumPnL = np.nansum(pnlList)
+            if cumPnL >= self.maxPnL or cumPnL <= self.minPnL:
+                self.closedDates.append(ind.date())
+            else:
+                if pnlList:
+                    cumPnLArray = np.nancumsum(pnlList)
+                    self.minPnLInThisDay = cumPnLArray.min()
+                    self.maxPnLInThisDay = cumPnLArray.max()
+
+    # This code is used when producing graphical output
+    def printOnSecondAxis(self, ax):
+        return None
+
+
+class StdLogic(Logic):
+    def __init__(
+        self,
+        filterStart=10,
+        filterEnd=60,
+        filterWindow=30,
+        windowType=None,
+        reverse=False,
+    ):
+        self.filterStart = filterStart
+        self.filterEnd = filterEnd
+        self.filterWindow = filterWindow
+        self.windowType = windowType
+        self.reverse = reverse
+        self.lastStd = 0
+        pass
+
+    def addEntranceReport(self, strategy, position):
+        position.stdWhenOpen = self.lastStd
+        return position
+
+    def addExitReport(self, strategy, position):
+        return position
+
+    # Codes to determine condition for trades, if the function returns True it means such trade is allowed.
+    def addBuyEntranceCondition(self, strategy, ind):
+        stdCondition = True
+        if any(self.stdSeries.index < ind):
+            lastStd = self.stdSeries[self.stdSeries.index < ind][-1]
+            self.lastStd = lastStd
+            stdCondition = (lastStd < self.filterStart) | (lastStd > self.filterEnd)
+
+            if self.reverse:
+                stdCondition = not stdCondition
+        return stdCondition
+
+    def addSellEntranceCondition(self, strategy, ind):
+        stdCondition = True
+        if any(self.stdSeries.index < ind):
+            lastStd = self.stdSeries[self.stdSeries.index < ind][-1]
+            self.lastStd = lastStd
+            stdCondition = (lastStd < self.filterStart) | (lastStd > self.filterEnd)
+
+            if self.reverse:
+                stdCondition = not stdCondition
+        return stdCondition
+
+    def detrendByBeta(self, ind_array):
+        slope, intercept, r_value, p_value, std_err = stats.linregress(
+            np.array(range(len(ind_array))), ind_array
+        )
+        ind_array = ind_array - range(len(ind_array)) * slope
+        return ind_array.std()
+
+    # This code execute once for each day before iteration on time
+    def computeForDay(self, strategy, timeSeriesTick, timeSeriesTrade):
+
+        window = str(int(self.filterWindow)) + "T"
+        timeSeriesReg = timeSeriesTick.resample(
+            str(int(self.filterWindow / 10)) + "S"
+        ).first()
+        timeSeriesReg = timeSeriesReg.fillna(method="pad")
+        # self.stdSeries = timeSeriesTick.rolling(window, win_type = self.windowType).std()
+        self.stdSeries = timeSeriesReg.rolling(window, win_type=None).apply(
+            self.detrendByBeta
+        )
+        return {"stdSeries": self.stdSeries}
+
+    def computeForAction(self, strategy, ind, val):
+        return {}
+
+    # This code is used when producing graphical output
+    def printOnSecondAxis(self, ax):
+        ax.plot(self.stdSeries.index, self.stdSeries, color="r", alpha=0.7)
+        ax.set_ylabel("rolling std")
+        ax.axhline(self.filterEnd, color="k", linestyle="--", lw=2, alpha=0.2)
+        ax.axhline(self.filterStart, color="k", linestyle="--", lw=2, alpha=0.2)

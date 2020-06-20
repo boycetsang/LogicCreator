@@ -1,13 +1,15 @@
+import numpy as np
 import pandas as pd
 import os, sys
 import matplotlib.pyplot as plt
-
+plt.style.use('ggplot')
 
 class StrategyOutput:
     def __init__(self, outputSettings):
         self.report = pd.DataFrame()
         self.outputSettings = outputSettings
         self.outputTable = pd.DataFrame()
+        self.lastAxes = None
 
     def __str__(self):
         return "StrategyOutput: " + str(self.outputSettings)
@@ -21,7 +23,7 @@ class StrategyOutput:
                 lst.insert(0, element)
         return lst
 
-    def outputToFile(self, strategy, silence=False, useNumber=0):
+    def outputToFile(self, strategy, silence=False, useNumber=0,):
         outputTable = strategy.strategyCalculator.printPositioninTable()
         if not outputTable.empty:
             # do some organization ...
@@ -66,7 +68,7 @@ class StrategyOutput:
             )
         )
 
-    def outputGraphs(self, strategy, dates=[], realtime=False):
+    def outputGraphs(self, strategy, dates=[], data=None, realtime=0):
         import matplotlib.dates as mdates
 
         if dates == [] and self.outputSettings["graphOutput"]:
@@ -77,14 +79,16 @@ class StrategyOutput:
             )
             for date in strategy.strategyData.tradeDateRange:
                 date = date.date()
-                print(date)
-                if not date in strategy.strategyData.dateFileDict.keys():
+                if data is None and not date in strategy.strategyData.dateFileDict.keys():
                     continue
-                timeSeries = pd.read_csv(
-                    strategy.strategyData.dateFileDict[date],
-                    index_col=None,
-                    na_values=["NA"],
-                )
+                if data is not None:
+                    timeSeries = data
+                else:
+                    timeSeries = pd.read_csv(
+                        strategy.strategyData.dateFileDict[date],
+                        index_col=None,
+                        na_values=["NA"],
+                    )
                 timeSeries = strategy.dataClean(date, timeSeries)
 
                 timeSeriesTick = timeSeries
@@ -97,13 +101,16 @@ class StrategyOutput:
                 if timeSeriesTrade.empty:
                     continue
 
-                timeSeriesTick.rename("price_tick").plot()
-                timeSeriesTrade.rename("price_interval").plot()
+                # timeSeriesTick.rename("price_tick").plot()
+                # timeSeriesTrade.rename("price_interval").plot()
+
 
                 strategy.strategyLogic.performComputeForDay(
                     strategy, timeSeriesTick, timeSeriesTrade
                 )
                 ax1 = plt.gca()
+                ax1.plot(timeSeriesTick.index, timeSeriesTick, label="price_tick")
+                ax1.plot(timeSeriesTrade.index, timeSeriesTrade, label="price_interval")
                 ax1.set_ylabel("price")
                 ax2 = ax1.twinx()
                 for logicSetting in strategy.strategyLogic.logicCollection:
@@ -146,7 +153,10 @@ class StrategyOutput:
                                 linewidth=1,
                             )
                         else:
-                            plt.plot(position.openTime, position.openPosition, "or")
+                            if np.isnan(position.closePosition):
+                                plt.plot(position.openTime, position.openPosition, "ok")
+                            else:
+                                plt.plot(position.openTime, position.openPosition, "or")
                             try:
                                 plt.plot(
                                     [position.openTime, position.closeTime],
@@ -185,7 +195,10 @@ class StrategyOutput:
                                 linewidth=1,
                             )
                         else:
-                            plt.plot(position.openTime, position.openPosition, "sr")
+                            if np.isnan(position.closePosition):
+                                plt.plot(position.openTime, position.openPosition, "ok")
+                            else:
+                                plt.plot(position.openTime, position.openPosition, "sr")
                             plt.plot(
                                 [position.openTime, position.closeTime],
                                 [position.openPosition, position.closePosition],
@@ -201,12 +214,13 @@ class StrategyOutput:
                 plt.savefig(graphPath, dpi=300)
                 if realtime:
                     plt.show(block=False)
-                    plt.pause(4)
-                    plt.close()
+                    plt.pause(realtime)
+                    self.lastAxes = plt.axis()
+                    # plt.close()
                 plt.clf()
-            print("Finished writing graphs to " + self.outputSettings["graphOutput"])
+            # print("Finished writing graphs to " + self.outputSettings["graphOutput"])
 
-    def outputGraphsDay(self, strategy, date, realtime=False):
+    def outputGraphsDay(self, strategy, date):
         import matplotlib.dates as mdates
 
         if self.outputSettings["graphOutput"]:
@@ -235,7 +249,7 @@ class StrategyOutput:
                 return
             timeSeriesTick.rename("price_tick").plot()
             timeSeriesTrade.rename("price_interval").plot()
-
+            print(timeSeriesTick.index)
             strategy.strategyLogic.performComputeForDay(
                 strategy, timeSeriesTick, timeSeriesTrade
             )
@@ -333,10 +347,6 @@ class StrategyOutput:
             xfmt = mdates.DateFormatter("%H:%M")
             plt.gca().xaxis.set_major_formatter(xfmt)
             plt.savefig(graphPath, dpi=300)
-            if realtime:
-                plt.show(block=False)
-                plt.pause(4)
-                plt.close()
             plt.clf()
 
     def getPnL(self, strategy):

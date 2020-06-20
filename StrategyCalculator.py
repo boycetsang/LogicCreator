@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import os
 
 
 class StrategyCalculator:
@@ -35,7 +36,7 @@ class StrategyCalculator:
         def __init__(self, strategy, openTime, openPosition, type):
             self.strategy = strategy
             self.openTime = openTime
-            self.openPosition = openPosition
+            self.openPosition = float(openPosition)
             self.closeTime = np.nan
             self.closePosition = np.nan
             self.tradeAmount = 1

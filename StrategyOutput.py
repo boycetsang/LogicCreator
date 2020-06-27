@@ -53,8 +53,6 @@ class StrategyOutput:
                     )
                 else:
                     outputTable.to_csv(self.outputSettings["summaryOutput"], index=None)
-                # print()
-                # print('Finished writing summary file to ' + self.outputSettings['summaryOutput'])
         else:
             self.outputTable = pd.DataFrame()
 

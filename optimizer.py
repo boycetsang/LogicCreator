@@ -70,12 +70,6 @@ def printOptVars(optVars):
     print(optTable.T)
 
 
-#    for optVar in optVars.keys():
-#        print( 'For', optVar +":" )
-#        print(optVars[optVar])
-#        print()
-
-
 def try_convert(s):
     if s is None:
         return None
@@ -156,7 +150,6 @@ def obtainSettings():
                 logicSettings[logicClass].update(
                     {args[ii]: inspect.getargspec(logicClass).defaults[ii]}
                 )
-    #    pd.DataFrame(settings, index = ['default']).T.to_csv('defaultValues.csv', index_label = 'setting')
     logicCollection = [x for (y, x) in sorted(zip(logicIndexList, logicCollection))]
     logicSettings = OrderedDict(
         (logic, logicSettings[logic]) for logic in logicCollection
@@ -165,7 +158,6 @@ def obtainSettings():
     optTable = readInTable[readInTable.isOpt > 0]
     del optTable["isOpt"]
     del optTable["default"]
-    #    optVars = OrderedDict(optTable.T.to_dict())
     optVars = OrderedDict(
         [
             (
@@ -181,13 +173,8 @@ def obtainSettings():
             for i, row in optTable.iterrows()
         ]
     )
-    #    for i, row in optTable.iterrows():
-    #        print(row)
     print(optVars)
     return settings, logicSettings, optVars
-
-
-#    outputSettings = {}
 
 
 from deap import algorithms
@@ -681,8 +668,7 @@ if __name__ == "__main__":
                 doCaliToo = False
                 if not os.path.exists(mdl_dir):
                     os.mkdir(mdl_dir)
-                opt_csv.to_csv(os.path.join(
-                        mdl_dir, 'selected_model.csv'))
+                opt_csv.to_csv(os.path.join(mdl_dir, "selected_model.csv"))
                 if choice == 0:
                     outputSettings["summaryOutput"] = os.path.join(
                         mdl_dir, "Summary_calibration.csv"

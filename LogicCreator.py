@@ -10,10 +10,12 @@ import os, sys
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
-pd.set_option('mode.chained_assignment', None)
+
+pd.set_option("mode.chained_assignment", None)
 
 
 class Strategy:
+    # Base object for Strategy to contain all the relevant variables
     def __init__(
         self,
         settings={},
@@ -42,16 +44,19 @@ class Strategy:
         )
 
     def dataClean(self, date, timeSeries):
+        # Data cleanup step to trim the time series, reset in defined time zone, and prepare pandas DataFrame with frequency
         timeSeries["datetime"] = pd.to_datetime(timeSeries.tradeTime, utc=True)
         timeSeries = timeSeries.set_index("datetime")
-        if not isinstance(timeSeries.index.dtype, pd.core.dtypes.dtypes.DatetimeTZDtype):
+        if not isinstance(
+            timeSeries.index.dtype, pd.core.dtypes.dtypes.DatetimeTZDtype
+        ):
             timeSeries.index = timeSeries.index.tz_localize(
                 self.strategySettings.settings["timezoneInRecord"]
             )
         else:
             timeSeries.index = timeSeries.index.tz_convert(
                 self.strategySettings.settings["timezoneInRecord"]
-            )            
+            )
         timeSeries = timeSeries.price
 
         timeSeries.name = "price"
@@ -123,69 +128,8 @@ class Strategy:
         #     ].iloc[-1]
         return timeSeries
 
-    def evalStrat(self, silence=False):
-        # evaluate strategy for every day defined
-        date_cnt = 0
-        date_total = len(
-            set(self.strategyData.tradeDateRange.date).intersection(
-                set(self.strategyData.dateFileDict.keys())
-            )
-        )
-        if not silence:
-            print("Backtesting in progress ...")
-        for date in self.strategyData.tradeDateRange:
-            date = date.date()
-            if not date in self.strategyData.dateFileDict.keys():
-                continue
-            self.strategyData.currentDate = date
-            self.strategyData.timeSeries = pd.read_csv(
-                self.strategyData.dateFileDict[date], na_values=["NA"]
-            )
-
-            self.strategyData.timeSeries = self.dataClean(
-                date, self.strategyData.timeSeries
-            )
-
-            self.strategyData.timeSeriesTick = self.strategyData.timeSeries
-            self.strategyData.timeSeriesTrade = self.strategyData.timeSeries.resample(
-                str(int(float(self.strategySettings.settings["interval"]) * 60)) + "S"
-            ).first()
-            if self.strategyData.timeSeriesTrade.empty:
-                date_cnt += 1
-                continue
-            self.strategyLogic.performComputeForDay(
-                self,
-                self.strategyData.timeSeriesTick,
-                self.strategyData.timeSeriesTrade,
-            )
-
-            for ind, val in self.strategyData.timeSeriesTrade.iteritems():
-                self.strategyLogic.performComputeForAction(self, ind, val)
-                if np.all(np.isnan(val)):
-                    continue
-                for position in self.strategyCalculator.openPositionList:
-                    if position.type == "buy" and (
-                        self.strategyLogic.getBuyExitCondition(self, position, ind)
-                    ):
-                        position.close(ind, val)
-                        self.strategyLogic.getExitReport(self, position)
-                    if position.type == "sell" and (
-                        self.strategyLogic.getSellExitCondition(self, position, ind)
-                    ):
-                        position.close(ind, val)
-                        self.strategyLogic.getExitReport(self, position)
-                if self.strategyLogic.getBuyEntranceCondition(self, ind):
-                    position = self.strategyCalculator.Position(self, ind, val, "buy")
-                    position = self.strategyLogic.getEntranceReport(self, position)
-                if self.strategyLogic.getSellEntranceCondition(self, ind):
-                    position = self.strategyCalculator.Position(self, ind, val, "sell")
-                    position = self.strategyLogic.getEntranceReport(self, position)
-            date_cnt += 1
-            if not silence:
-                self.strategyOutput.updateProgress(date_cnt / date_total)
-
     def evalStratDay(self, date, data=None, positionClass=None):
-        # if positionType is defined, use realtime execution instead
+        # Worker function to execute logic on the time series
         date = date.date()
         if data is None:
             if not date in self.strategyData.dateFileDict.keys():
@@ -272,8 +216,29 @@ class Strategy:
         self.strategyCalculator.positionList = []
         return result
 
+    def evalStrat(self, silence=False):
+        # evaluate strategy using 1 thread. This function does not use joblib.
+        date_cnt = 0
+        date_total = len(
+            set(self.strategyData.tradeDateRange.date).intersection(
+                set(self.strategyData.dateFileDict.keys())
+            )
+        )
+        if not silence:
+            print("Backtesting in progress ...")
+        for date in self.strategyData.tradeDateRange:
+            date_key = date.date()
+            if not date_key in self.strategyData.dateFileDict.keys():
+                continue
+            result = self.evalStratDay(date)
+            self.strategyCalculator.positionList += result
+
+            date_cnt += 1
+            if not silence:
+                self.strategyOutput.updateProgress(date_cnt / date_total)
+
     def evalStratParallel(self, silence=False, num_core=0):
-        # evaluate strategy for every day defined
+        # evaluate strategy using parallel process
         from joblib import Parallel, delayed
 
         import multiprocessing
@@ -300,7 +265,7 @@ class Strategy:
         self.strategyCalculator.positionList = results
 
     def outputGraphsParallel(self, silence=False, num_core=0):
-        # produce graph for every day defined
+        # produce graph using parallel process
         from joblib import Parallel, delayed
         import multiprocessing
 
@@ -319,6 +284,7 @@ class Strategy:
             self.strategyCalculator.positionList + other.strategyCalculator.positionList
         )
         return self
+
 
 def defaultSettings(settings):
     settings["timezoneInIndex"] = "UTC"
@@ -342,6 +308,7 @@ def defaultSettings(settings):
 
     return settings
 
+
 if __name__ == "__main__":
     start = time.time()
     ## Define strategy settings here
@@ -363,21 +330,6 @@ if __name__ == "__main__":
     dataSettings["getDataDaysBefore"] = settings["dataPath"]
 
     # Add Logic here
-    #    logicSettings[BasicLogic] = {'takeProfit' : settings['Basic_takeProfit'], "stopLoss" : settings['Basic_stopLoss'], 'totalExposure': settings['Basic_maxExposure']}
-    #    logicSettings[VelLogic] = {'period': settings['Vel_period'], 'threshold': settings['Vel_threshold']}
-    #    logicSettings[RegLogic] = {'period': settings['Reg_period'], 'delta_period': settings['Reg_delta_period'], 'beta_threshold': settings['Reg_beta_threshold'], 'filter_type': settings['Reg_filter_type']}
-
-    #    logicSettings[StdLogic] = {'filterStart': settings['std_filterStart'], 'filterEnd': settings['std_filterEnd'], 'filterWindow': settings['std_filterWindow']}
-    #    logicSettings[PnLLogic] = {'minPnL': settings['PnL_minPnL'], 'maxPnL': settings['PnL_maxPnL']}
-    # logicSettings[DayEndLogic] = {'minsToForceExit': settings['DayEnd_minsToForceExit']}
-    #    logicSettings[RyanLogic] = {'x': 10, 'y': 200}
-    #    print(logicSettings)
-
-    # ogicSettings[BasicLogic] = {}
-    # logicSettings[VelLogic] = {}
-    #    logicSettings[RegLogic] = {}
-
-    #    logicSettings[StdLogic] = {}
     logicSettings[PnLLogic] = dict(minPnL=-500)
 
     logicSettings[BasicLogic] = dict(
@@ -397,11 +349,13 @@ if __name__ == "__main__":
     #     # windowType = None,
     #     reverse=False,
     # )
-    logicSettings[MALogic] = dict(fast_period=30, 
-                                  slow_period=120,
-                                  wait_period=15,
-                                  delta_thres=0.5,
-                                  resample_period=5)
+    logicSettings[MALogic] = dict(
+        fast_period=30,
+        slow_period=120,
+        wait_period=15,
+        delta_thres=0.5,
+        resample_period=5,
+    )
     logicSettings[DayEndLogic] = dict(minsToForceExit=11.25)
 
     calSettings["slippery"] = settings["slippery"]

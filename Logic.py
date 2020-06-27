@@ -622,6 +622,8 @@ class StdLogic(Logic):
         return stdCondition
 
     def detrendByBeta(self, ind_array):
+        # Lazy import because this is not used often
+        import scipy.stats as stat
         slope, intercept, r_value, p_value, std_err = stats.linregress(
             np.array(range(len(ind_array))), ind_array
         )

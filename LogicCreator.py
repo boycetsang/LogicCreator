@@ -425,8 +425,8 @@ if __name__ == "__main__":
 
     print("Real PnL for the strategy is: ", realPnL)
 
-    strategy.strategyOutput.outputGraphs(strategy, realtime=True)
-    # strategy.outputGraphsParallel()
+    # strategy.strategyOutput.outputGraphs(strategy, realtime=True)
+    strategy.outputGraphsParallel()
 
     print(
         "Benchmark Time from "

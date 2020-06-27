@@ -50,61 +50,6 @@ class Logic(object):
         return None
 
 
-class DayEndLogic(Logic):
-    """ Day End Logic, approaching end of day strategy should try to close positions
-        This Logic class should be placed towards the end of logic chain.
-
-        Parameters
-        -----
-        minToForceExit: int
-            Time before tradeEndTime to force exit (in mins).
-
-    """
-
-    SELL_EXIT_LOGIC_OPERATION = "or"
-    BUY_EXIT_LOGIC_OPERATION = "or"
-
-    def __init__(self, minsToForceExit=30):
-        self.minsToForceExit = minsToForceExit
-        self.timeToForceExit = None
-
-    def addSellExitCondition(self, strategy, position, ind):
-        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
-            minutes=self.minsToForceExit
-        )
-        if ind.time() >= self.timeToForceExit.time():
-            return True
-        else:
-            return False
-
-    def addBuyExitCondition(self, strategy, position, ind):
-        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
-            minutes=self.minsToForceExit
-        )
-        if ind.time() >= self.timeToForceExit.time():
-            return True
-        else:
-            return False
-
-    def addSellEntranceCondition(self, strategy, ind):
-        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
-            minutes=self.minsToForceExit
-        )
-        if ind.time() >= self.timeToForceExit.time():
-            return False
-        else:
-            return True
-
-    def addBuyEntranceCondition(self, strategy, ind):
-        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
-            minutes=self.minsToForceExit
-        )
-        if ind.time() >= self.timeToForceExit.time():
-            return False
-        else:
-            return True
-
-
 class BasicLogic(Logic):
     """ Standard Logic, controlling profit, loss and exposure
         
@@ -170,7 +115,7 @@ class BasicLogic(Logic):
                 if val > position.openPosition + realTakeProfit:
                     tst = strategy.strategyData.timeSeriesTick
                     if tst[tst < position.openPosition + realTakeProfit].shape[0] > 0:
-                        tst = tst[tst[tst < position.openPosition + realTakeProfit].index[-1], :]
+                        tst = tst.loc[tst[tst < position.openPosition + realTakeProfit].index[-1]]
                         tst_max = tst.max()
                         if tst_max - val < self.trailing:
                             return False
@@ -672,7 +617,7 @@ class MALogic(Logic):
     SELL_EXIT_LOGIC_OPERATION = "or"
     BUY_EXIT_LOGIC_OPERATION = "or"
     def __init__(self, 
-                 fast_period=480, 
+                 fast_period=80, 
                  slow_period=180,
                  delta_thres=0,
                  wait_period=20,
@@ -686,6 +631,7 @@ class MALogic(Logic):
     def addEntranceReport(self, strategy, position):
         position.ewma = self.ewma
         position.ewmaLong = self.ewmaLong
+        return position
 
     def computeForDay(self, strategy, timeSeriesTick, timeSeriesTrade):
         timeSeriesReg = timeSeriesTick.resample(str(int(self.resample_period))+'S').first()
@@ -722,6 +668,59 @@ class MALogic(Logic):
         return False
     
     def printOnSecondAxis(self, ax):
-       ax.plot(self.ewmaSeries.index, self.ewmaSeries, color = 'b', alpha = 0.7, label='ewma')
-       ax.plot(self.ewmaLongSeries.index, self.ewmaLongSeries, color = 'r', alpha = 0.7, label='ewmaLong')
+        ax.plot(self.ewmaSeries.index, self.ewmaSeries, color = 'b', alpha = 0.7, label='ewma')
+        ax.plot(self.ewmaLongSeries.index, self.ewmaLongSeries, color = 'r', alpha = 0.7, label='ewmaLong')
 
+class DayEndLogic(Logic):
+    """ Day End Logic, approaching end of day strategy should try to close positions
+        This Logic class should be placed towards the end of logic chain.
+
+        Parameters
+        -----
+        minToForceExit: int
+            Time before tradeEndTime to force exit (in mins).
+
+    """
+
+    SELL_EXIT_LOGIC_OPERATION = "or"
+    BUY_EXIT_LOGIC_OPERATION = "or"
+
+    def __init__(self, minsToForceExit=30):
+        self.minsToForceExit = minsToForceExit
+        self.timeToForceExit = None
+
+    def addSellExitCondition(self, strategy, position, ind):
+        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
+            minutes=self.minsToForceExit
+        )
+        if ind.time() >= self.timeToForceExit.time():
+            return True
+        else:
+            return False
+
+    def addBuyExitCondition(self, strategy, position, ind):
+        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
+            minutes=self.minsToForceExit
+        )
+        if ind.time() >= self.timeToForceExit.time():
+            return True
+        else:
+            return False
+
+    def addSellEntranceCondition(self, strategy, ind):
+        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
+            minutes=self.minsToForceExit
+        )
+        if ind.time() >= self.timeToForceExit.time():
+            return False
+        else:
+            return True
+
+    def addBuyEntranceCondition(self, strategy, ind):
+        self.timeToForceExit = strategy.tradeEndTime - pd.Timedelta(
+            minutes=self.minsToForceExit
+        )
+        if ind.time() >= self.timeToForceExit.time():
+            return False
+        else:
+            return True

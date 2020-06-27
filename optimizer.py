@@ -273,7 +273,7 @@ def evalOneMax(individual, settings, logicSettings, optVars):
         logicSettingsExecute[logicClass].pop("status")
 
     #    print(logicSettingsExecute)
-    Strategy = LogicCreator.Strategy(
+    strategy = LogicCreator.Strategy(
         settings=settings,
         dataSettings=dataSettings,
         logicSettings=logicSettingsExecute,
@@ -307,7 +307,7 @@ def evalOneMax(individual, settings, logicSettings, optVars):
     metric.append(str(realPnLMaxDrawBackInDay))
     metric.append(str(realPnLMaxDrawBack))
     metric.append(str(realWinDayRatio))
-    fitness = pnl + 0.1 * realPnLMaxDrawBack
+    fitness = pnl + 0.1 * realPnLMaxDrawBack + realPnLPerTrade * 1000
 
     global counter
     if lock:
@@ -620,14 +620,14 @@ if __name__ == "__main__":
             logicSettings = OrderedDict()
             calSettings = dict()
             outputSettings = dict()
-            run_dir = glob.glob("CALI_RUN*")
+            run_dir = glob.glob("EXPT_RUN*")
 
             print("Available calibration results ...  choose from following")
 
             print("\n".join(run_dir))
 
             run_dir_chosen = input("Enter the calibration set number \n")
-            run_dir_chosen = "CALI_RUN_" + run_dir_chosen
+            run_dir_chosen = "EXPT_RUN_" + run_dir_chosen
             os.chdir(run_dir_chosen)
 
             result_csv = pd.read_csv("calibration_result.csv")
@@ -653,6 +653,7 @@ if __name__ == "__main__":
             for col in result_csv.columns.values:
                 if col in settings.keys():
                     settings[col] = result_csv[col].iloc[0]
+                    opt_csv.default[col] = settings[col]
 
             for setting in settings:
                 if isinstance(settings[setting], float):
@@ -678,6 +679,10 @@ if __name__ == "__main__":
             doCaliToo = True
             while doCaliToo:
                 doCaliToo = False
+                if not os.path.exists(mdl_dir):
+                    os.mkdir(mdl_dir)
+                opt_csv.to_csv(os.path.join(
+                        mdl_dir, 'selected_model.csv'))
                 if choice == 0:
                     outputSettings["summaryOutput"] = os.path.join(
                         mdl_dir, "Summary_calibration.csv"
@@ -837,7 +842,7 @@ if __name__ == "__main__":
             )
             print("-=-" * 15)
             print()
-            test_gold_dir = "CALI_RUN"
+            test_gold_dir = "EXPT_RUN"
             cwd = os.getcwd()
             i = 0
             while i < 100:
@@ -851,6 +856,7 @@ if __name__ == "__main__":
                     break
                 else:
                     i += 1
+
             if optVars:
                 printOptVars(optVars)
                 choice = input(

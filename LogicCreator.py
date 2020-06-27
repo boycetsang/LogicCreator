@@ -9,8 +9,8 @@ from StrategyOutput import StrategyOutput
 import os, sys
 import pandas as pd
 import matplotlib.pyplot as plt
-
-
+import matplotlib
+pd.set_option('mode.chained_assignment', None)
 
 
 class Strategy:
@@ -42,11 +42,16 @@ class Strategy:
         )
 
     def dataClean(self, date, timeSeries):
-        timeSeries["datetime"] = pd.to_datetime(timeSeries.tradeTime)
+        timeSeries["datetime"] = pd.to_datetime(timeSeries.tradeTime, utc=True)
         timeSeries = timeSeries.set_index("datetime")
-        timeSeries.index = timeSeries.index.tz_localize(
-            self.strategySettings.settings["timezoneInRecord"]
-        )
+        if not isinstance(timeSeries.index.dtype, pd.core.dtypes.dtypes.DatetimeTZDtype):
+            timeSeries.index = timeSeries.index.tz_localize(
+                self.strategySettings.settings["timezoneInRecord"]
+            )
+        else:
+            timeSeries.index = timeSeries.index.tz_convert(
+                self.strategySettings.settings["timezoneInRecord"]
+            )            
         timeSeries = timeSeries.price
 
         timeSeries.name = "price"
@@ -100,8 +105,6 @@ class Strategy:
             .tz_localize(self.strategySettings.settings["timezoneInIndex"])
             .tz_convert(self.strategySettings.settings["timezoneInRecord"])
         )
-        # print(timeSeries.index.min(), timeSeries.index.max())
-
         grouped = timeSeries.groupby(level=0)
         timeSeries = grouped.last()
         timeSeries = timeSeries[
@@ -112,12 +115,12 @@ class Strategy:
                 | (timeSeries.index < self.lunchStartTime)
             )
         ]
+        timeSeries = timeSeries.astype(float)
         # treating the insufficient data case
-        if len(timeSeries) != 0:
-            timeSeries[self.indexEndTime] = timeSeries[
-                (timeSeries.index <= self.indexEndTime)
-            ].iloc[-1]
-        # print(timeSeries)
+        # if len(timeSeries) != 0:
+        #     timeSeries[self.indexEndTime] = timeSeries[
+        #         (timeSeries.index <= self.indexEndTime)
+        #     ].iloc[-1]
         return timeSeries
 
     def evalStrat(self, silence=False):
@@ -181,18 +184,23 @@ class Strategy:
             if not silence:
                 self.strategyOutput.updateProgress(date_cnt / date_total)
 
-    def evalStratDay(self, date):
+    def evalStratDay(self, date, data=None, positionClass=None):
+        # if positionType is defined, use realtime execution instead
         date = date.date()
-        if not date in self.strategyData.dateFileDict.keys():
-            return
-        self.strategyData.currentDate = date
-        self.strategyData.timeSeries = pd.read_csv(
-            self.strategyData.dateFileDict[date], na_values=["NA"]
-        )
+        if data is None:
+            if not date in self.strategyData.dateFileDict.keys():
+                return
+            self.strategyData.currentDate = date
+            self.strategyData.timeSeries = pd.read_csv(
+                self.strategyData.dateFileDict[date], na_values=["NA"]
+            )
+        else:
+            self.strategyData.currentDate = date
+            self.strategyData.timeSeries = data
+
         self.strategyData.timeSeries = self.dataClean(
             date, self.strategyData.timeSeries
         )
-
         self.strategyData.timeSeriesTick = self.strategyData.timeSeries
         self.strategyData.timeSeriesTrade = self.strategyData.timeSeries.resample(
             str(int(float(self.strategySettings.settings["interval"]) * 60)) + "S"
@@ -202,7 +210,32 @@ class Strategy:
         self.strategyLogic.performComputeForDay(
             self, self.strategyData.timeSeriesTick, self.strategyData.timeSeriesTrade
         )
-
+        if positionClass is not None:
+            val = self.strategyData.timeSeriesTrade.iloc[-1]
+            ind = self.strategyData.timeSeriesTrade.index[-1]
+            self.strategyLogic.performComputeForAction(self, ind, val)
+            if np.isnan(val):
+                return
+            for position in self.strategyCalculator.openPositionList:
+                if position.type == "buy" and (
+                    self.strategyLogic.getBuyExitCondition(self, position, ind)
+                ):
+                    position.close(ind, val)
+                    self.strategyLogic.getExitReport(self, position)
+                if position.type == "sell" and (
+                    self.strategyLogic.getSellExitCondition(self, position, ind)
+                ):
+                    position.close(ind, val)
+                    self.strategyLogic.getExitReport(self, position)
+            # if ind in [p.openTime for p in self.strategyCalculator.openPositionList]:
+            #     return
+            if self.strategyLogic.getBuyEntranceCondition(self, ind):
+                position = positionClass(self, ind, val, "buy")
+                position = self.strategyLogic.getEntranceReport(self, position)
+            if self.strategyLogic.getSellEntranceCondition(self, ind):
+                position = positionClass(self, ind, val, "sell")
+                position = self.strategyLogic.getEntranceReport(self, position)
+            return
         for ind, val in self.strategyData.timeSeriesTrade.iteritems():
             self.strategyLogic.performComputeForAction(self, ind, val)
             if np.isnan(val):
@@ -232,7 +265,10 @@ class Strategy:
             self.strategyCalculator.positionList = None
         import copy
 
-        result = copy.deepcopy(self.strategyCalculator.positionList)
+        if (self.strategyCalculator.positionList) is None:
+            self.strategyCalculator.positionList = []
+            return []
+        result = list(self.strategyCalculator.positionList)
         self.strategyCalculator.positionList = []
         return result
 
@@ -287,6 +323,7 @@ class Strategy:
 def defaultSettings(settings):
     settings["timezoneInIndex"] = "UTC"
     settings["timezoneInRecord"] = "GMT"
+    settings["timezoneInExecution"] = "America/Los_Angeles"
     settings["indexStartTime"] = "11:45:00"
     settings["indexEndTime"] = "20:00:00"
     settings["tradeStartTime"] = "11:45:00"
@@ -296,9 +333,9 @@ def defaultSettings(settings):
     settings["interval"] = 1
     settings["slippery"] = 0.2
 
-    settings["dataPath"] = r"/mnt/c/Users/Boyce/PythonProject/LogicCreator/data"
-    settings["dateStart"] = "20190422"
-    settings["dateEnd"] = "20200424"
+    settings["dataPath"] = os.path.realpath("./data")
+    settings["dateStart"] = "20190401"
+    settings["dateEnd"] = "20190424"
 
     settings["graphOutput"] = "graph_output"
     settings["summaryOutput"] = "Summary.csv"
@@ -341,7 +378,7 @@ if __name__ == "__main__":
     #    logicSettings[RegLogic] = {}
 
     #    logicSettings[StdLogic] = {}
-    #    logicSettings[PnLLogic] = {}
+    logicSettings[PnLLogic] = dict(minPnL=-500)
 
     logicSettings[BasicLogic] = dict(
         takeProfit=0.02, stopLoss=0.02, totalExposure=10, trailing=0
@@ -388,7 +425,7 @@ if __name__ == "__main__":
 
     print("Real PnL for the strategy is: ", realPnL)
 
-    strategy.strategyOutput.outputGraphs(strategy)
+    strategy.strategyOutput.outputGraphs(strategy, realtime=True)
     # strategy.outputGraphsParallel()
 
     print(

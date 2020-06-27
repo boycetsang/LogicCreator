@@ -334,13 +334,13 @@ def evalOneMax(individual, settings, logicSettings, optVars):
     soln_cnt += 1
     if veri:
         strategy.strategyOutput.outputToFile(strategy)
-        writeStr = ",".join(
-            [str(counter.value)]
-            + [str(optVarValue[x]) for x in optVarValue.keys()]
-            + metric
-            + [str(fitness)]
-        )
-        print(writeStr)
+        # writeStr = ",".join(
+        #     [str(counter.value)]
+        #     + [str(optVarValue[x]) for x in optVarValue.keys()]
+        #     + metric
+        #     + [str(fitness)]
+        # )
+        # print(writeStr)
         sys.exit(0)
 
     return (fitness,)

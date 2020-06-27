@@ -255,7 +255,7 @@ class StrategyOutput:
             ]
             for position in positionListForThisDate:
                 if position.type == "buy":
-                    if position.movement:
+                    if hasattr(position, "movement") and position.movement:
                         if position.closePosition > position.openPosition:
                             plt.plot(
                                 [position.openTime, position.openTime],
@@ -291,7 +291,7 @@ class StrategyOutput:
                             linewidth=1,
                         )
                 if position.type == "sell":
-                    if position.movement:
+                    if hasattr(position, "movement") and position.movement:
                         if position.closePosition > position.openPosition:
                             plt.plot(
                                 [position.openTime, position.openTime],

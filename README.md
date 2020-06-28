@@ -51,3 +51,19 @@ Towards the end of the file, the function `defaultSettings` define all the modul
 In the main section, you can add/remove logic as you wish using a dictionary to define all the logic parameters.
 
 After changing this file, you can re-run and see how the trades are behaving differently.
+
+## Searching for optimal logic parameters
+Instead of manually searching for a best strategy, you can also use the python package `deap` to search for a few optimal solutions and inspect only those solution.
+
+To use the optimizer, initialize the setting files by
+
+`python init_opt.py`
+
+You should see a new csv file called `optSettings.csv`, open it up in excel/text editor. You can then change the default, min, max, and step value for all parameters.
+
+Then, execute the optimizer by 
+
+`python optimizer.py`
+
+You can then change a few things before launching the optimizer.
+

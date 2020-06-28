@@ -224,6 +224,24 @@ class BasicLogic(Logic):
 
 
 class RSILogic(Logic):
+    """ RSI Logic, controlling entrance using RSI indicator
+        
+        Parameters
+        -----
+        filterStart: float
+            minimum RSI to trigger an entrance
+        filterEnd: float
+            maximum RSI to trigger an entrance
+        filterWindow: float
+            lag minutes to perform RSI calculation
+        reverse: bool
+            if True, reverse the behavior of the module
+
+        Returns at report
+        -----
+        rsi: float
+            RSI value at entrance point
+    """
     def __init__(self, filterStart=10, filterEnd=60, filterWindow=30, reverse=False):
         self.filterStart = filterStart
         self.filterEnd = filterEnd
@@ -442,6 +460,21 @@ class RegLogic(Logic):
 
 
 class VelLogic(Logic):
+    """ Trade filter using simple velocity
+
+        Parameter
+        -----
+        period: int
+            time window where velocity calculation is performed (in seconds)
+        threshold: float 
+            minimum velocity to trigger an entrance
+
+        Return at report
+        -----
+        velocity: float
+            value of velocity at entrance
+        
+    """
     def __init__(self, period=40, threshold=0.03):
         self.period = period
         self.threshold = threshold
@@ -483,6 +516,22 @@ class VelLogic(Logic):
 
 
 class PnLLogic(Logic):
+    """ Trade filter using day-PnL
+
+        Parameter
+        -----
+        minPnL: float
+            if total PnL of the day is smaller than this value, no entrance can be triggered
+        maxPnL: float
+            if total PnL of the day is larger than this value, no entrance can be triggered
+        Return at report
+        -----
+        minPnLInThisDayWhenOpen: float
+            minimum PnL of the day at entrance point
+        maxPnLInThisDayWhenOpen: float
+            maximum PnL of the day at entrance point
+        
+    """
     SELL_EXIT_LOGIC_OPERATION = "or"
     BUY_EXIT_LOGIC_OPERATION = "or"
 
@@ -578,6 +627,25 @@ class PnLLogic(Logic):
 
 
 class StdLogic(Logic):
+    """ STD Logic, controlling entrance using standard deviation indicator. Standard deviation 
+        calculations are de-trended by a OLS fit first
+        
+        Parameters
+        -----
+        filterStart: float
+            minimum STD to trigger an entrance
+        filterEnd: float
+            maximum STD to trigger an entrance
+        filterWindow: float
+            lag minutes to perform STD calculation
+        reverse: bool
+            if True, reverse the behavior of the module
+
+        Returns at report
+        -----
+        stdWhenOpen: float
+            STD value at entrance point
+    """
     def __init__(
         self,
         filterStart=10,

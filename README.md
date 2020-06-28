@@ -28,7 +28,7 @@ We need an external source to download tick-by-tick histoical data and I am not 
 Instead, we can use this application called [Quant Data Manager](https://strategyquant.com/quantdatamanager/) to acquire historical data.
 
 Pick your favourite stock ticker and download all its histroical data, export to csv and place it under the `data_pre` location
-![QuantDataManager](https://github.com/boycetsang/LogicCreator/blob/master/quantapp.JPG)
+![QuantDataManager](https://github.com/boycetsang/LogicCreator/blob/master/docs/quantapp.JPG)
 
 Before we run the backtester, we need clean and separate the long csv file by date for efficiency.
 
@@ -75,7 +75,8 @@ If needed, this function can be used to calculate quantities that are used throu
 This function is called when a position is opened/closed, but not due to this logic.
 
 #### printOnSecondAxis(self, ax):
-Only the last logic module that has this function will be effective. This function allow a secondary axis plot on the graph output.
+Only the last logic module that has this function will be effective. This function allow a secondary axis plot on the graph output. Here is an example
+![Graph Example](https://github.com/boycetsang/LogicCreator/blob/master/docs/graph_example.png)
 
 ## Searching for optimal logic parameters
 Instead of manually searching for a best strategy, you can also use the python package `deap` to search for a few optimal solutions and inspect only those solution.

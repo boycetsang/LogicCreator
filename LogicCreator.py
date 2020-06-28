@@ -15,7 +15,17 @@ pd.set_option("mode.chained_assignment", None)
 
 
 class Strategy:
-    # Base object for Strategy to contain all the relevant variables
+    """Base object for Strategy to contain all the relevant variables
+
+    Parameters:
+    settings(dict): contains file/locale settings such as timezone, file paths
+    dataSettings{dict}: contains date-related settings
+    logicSettings(dict): contains logic-related settings, such as if a logic module is enabled, and its parameters
+    calSettings{dict}: contains PnL-calculation settings, such as slippery
+    outputSettings(dict): contains file and graphical output settings
+
+   """
+
     def __init__(
         self,
         settings={},
@@ -44,7 +54,15 @@ class Strategy:
         )
 
     def dataClean(self, date, timeSeries):
-        # Data cleanup step to trim the time series, reset in defined time zone, and prepare pandas DataFrame with frequency
+        """Data cleanup step to trim the time series, reset in defined time zone, and prepare pandas DataFrame with frequency
+
+        Parameters:
+        date(str): date to extract time series in format "YYYYMMDD" 
+        timeSeries(pd.Series): time series to be processed
+
+        Return:
+        timeSeries(pd.Series): processed time series
+       """
         timeSeries["datetime"] = pd.to_datetime(timeSeries.tradeTime, utc=True)
         timeSeries = timeSeries.set_index("datetime")
         if not isinstance(
@@ -129,7 +147,13 @@ class Strategy:
         return timeSeries
 
     def evalStratDay(self, date, data=None, positionClass=None):
-        # Worker function to execute logic on the time series
+        """Worker function to execute logic on the time series
+
+        Parameters:
+        date(pd.Datetime): date to execute strategy 
+        data(pd.Series): use this time series instead of the one stored in the object
+        positionClass(position): Use this position class instead of the default one
+       """
         date = date.date()
         if data is None:
             if not date in self.strategyData.dateFileDict.keys():
@@ -323,7 +347,6 @@ if __name__ == "__main__":
     outputSettings["graphOutput"] = settings["graphOutput"]
     outputSettings["summaryOutput"] = settings["summaryOutput"]
 
-    #    strategy.strategySettings = StrategySettings(settings)
     dataSettings["dataPath"] = settings["dataPath"]
     dataSettings["dateStart"] = settings["dateStart"]
     dataSettings["dateEnd"] = settings["dateEnd"]
@@ -379,7 +402,9 @@ if __name__ == "__main__":
 
     print("Real PnL for the strategy is: ", realPnL)
 
+    # single-thread process for graph output
     # strategy.strategyOutput.outputGraphs(strategy, realtime=True)
+    # multi-thread process for graph output
     strategy.outputGraphsParallel()
 
     print(

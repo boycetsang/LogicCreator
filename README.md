@@ -43,14 +43,39 @@ After the program has finished, you should see a new file `Summary.csv` and a co
 
 You can review them to see how the default logic have worked. It may have made no trades at all.
 
-### Manually tune logic parameters
+## Create your own logic
+### Customize logic flow
 Open up LogicCreator.py with a text editor. Now you have full access to the backtesting settings.
 
 Towards the end of the file, the function `defaultSettings` define all the module-level parameters, such as backtesting date range, output file paths, etc.
 
-In the main section, you can add/remove logic as you wish using a dictionary to define all the logic parameters.
+In the main section, you can add/remove logic as you wish using a dictionary to define all the logic parameters. You can open up `Logic.py` to see what parameters are available on each logic module.
 
 After changing this file, you can re-run and see how the trades are behaving differently.
+
+### How to use the `Logic` object 
+`LogicCreator` is written to allow flexible implementation of time series manipulation using pandas. All trigger (or prohibition) of position entrance are wrapped under the `Logic` class in `Logic.py`. All `Logic` class definition must contain the following functions/attributes (even if they do nothing). You should use the base class as a template and use the existing logic module as examples.
+
+#### BUY_ENTRANCE_LOGIC_OPERATION, SELL_ENTRANCE_LOGIC_OPERATION, BUY_EXIT_LOGIC_OPERATION, SELL_EXIT_LOGIC_OPERATION
+When more than 1 logic modules are enabled, the buy/sell entrance/exit logics has to be combined. The order is defined in the order it was added in `LogicCreator.py`. These attributes define the logic left-operation relative to this module. The only possible values are 'and' and 'or'.
+
+#### __init__(
+The constructor has to take in the logic parameters and assign them to the object.
+
+#### addEntranceReport, addExitReport
+When an entrance/exit is triggered, this function is called to allow reporting values to `Summary.csv`
+
+#### addBuyEntranceCondition, addBuyExitCondition, addSellEntranceCondition, addSellExitCondition
+For every `interval`, these functions are called to see if a position should be opened/closed.
+
+#### computeForDay
+If needed, this function can be used to calculate quantities that are used throughout the day for faster backtesting.
+
+#### computeForAction
+This function is called when a position is opened/closed, but not due to this logic.
+
+#### printOnSecondAxis(self, ax):
+Only the last logic module that has this function will be effective. This function allow a secondary axis plot on the graph output.
 
 ## Searching for optimal logic parameters
 Instead of manually searching for a best strategy, you can also use the python package `deap` to search for a few optimal solutions and inspect only those solution.

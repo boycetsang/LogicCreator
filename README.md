@@ -2,7 +2,7 @@
 This is a Python-based simple day trading backtester that allow users to customize their entrance/exit long/short logics based on the movement of the same day. It also comes with an optimizer to fine-tune logic parameters. 
 * This works only under Linux environments, but today Linux subsystem ([WSL](https://docs.microsoft.com/en-us/learn/modules/get-started-with-windows-subsystem-for-linux/)) is very accessible in Windows. This is also where I developed and tested the code.
 
-## Getting Started (10 mins)
+## Getting Started
 ### Setting up Repo and Python virtual environment
 Let's get started by preparing your own Python virtual environment. Please install Python 3.6+ on your OS. Then use
 
@@ -59,7 +59,7 @@ After changing this file, you can re-run and see how the trades are behaving dif
 #### BUY_ENTRANCE_LOGIC_OPERATION, SELL_ENTRANCE_LOGIC_OPERATION, BUY_EXIT_LOGIC_OPERATION, SELL_EXIT_LOGIC_OPERATION
 When more than 1 logic modules are enabled, the buy/sell entrance/exit logics has to be combined. The order is defined in the order it was added in `LogicCreator.py`. These attributes define the logic left-operation relative to this module. The only possible values are 'and' and 'or'.
 
-#### __init__(
+#### __init__
 The constructor has to take in the logic parameters and assign them to the object.
 
 #### addEntranceReport, addExitReport

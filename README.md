@@ -78,7 +78,7 @@ This function is called when a position is opened/closed, but not due to this lo
 Only the last logic module that has this function will be effective. This function allow a secondary axis plot on the graph output. Here is an example
 ![Graph Example](https://github.com/boycetsang/LogicCreator/blob/master/docs/graph_example.png)
 
-## Searching for optimal logic parameters
+## Searching for strategies with optimal logic parameters
 Instead of manually searching for a best strategy, you can also use the python package `deap` to search for a few optimal solutions and inspect only those solution.
 
 To use the optimizer, initialize the setting files by
@@ -91,5 +91,7 @@ Then, execute the optimizer by
 
 `python optimizer.py`
 
-You can then change a few things before launching the optimizer.
+You can then change a few things before launching the optimizer. You will see backtesting runs as extra directory in the current location. 
 
+## Cross-validating optimized strategy
+THe optimizer can almost always find good in-sample solution - that's why it is a good idea to use a different dataset (e.g. different date range) to challenge the selected strategy. This can be done by the same script, but using the verification option in command line menu.

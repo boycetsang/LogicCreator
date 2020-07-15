@@ -74,7 +74,7 @@ If needed, this function can be used to calculate quantities that are used throu
 #### computeForAction
 This function is called when a position is opened/closed, but not due to this logic.
 
-#### printOnSecondAxis(self, ax):
+#### printOnSecondAxis
 Only the last logic module that has this function will be effective. This function allow a secondary axis plot on the graph output. Here is an example  
 <img src="https://github.com/boycetsang/LogicCreator/blob/master/docs/graph_example.png" width="500">
 

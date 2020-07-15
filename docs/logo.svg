@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="100mm"
+   width="200mm"
    height="50mm"
-   viewBox="0 0 354.33071 177.16535"
+   viewBox="0 0 708.66142 177.16535"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
@@ -20,10 +20,10 @@
      id="defs4">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="-176.8111 : 43.576486 : 1"
+       inkscape:vp_x="-222.70396 : 43.933629 : 1"
        inkscape:vp_y="0 : 999.99993 : 0"
-       inkscape:vp_z="567.28336 : 43.576486 : 1"
-       inkscape:persp3d-origin="195.23613 : -131.81721 : 1"
+       inkscape:vp_z="521.3905 : 43.933629 : 1"
+       inkscape:persp3d-origin="149.34327 : -131.46006 : 1"
        id="perspective4140" />
   </defs>
   <sodipodi:namedview
@@ -33,9 +33,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="-301.49291"
-     inkscape:cy="327.72465"
+     inkscape:zoom="1.4"
+     inkscape:cx="-368.03988"
+     inkscape:cy="428.67454"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -64,7 +64,7 @@
     <rect
        style="opacity:1;fill:#fff6d5;stroke:none;stroke-width:8.10000038;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4190"
-       width="334.3605"
+       width="673.64624"
        height="4.0406103"
        x="8.8388348"
        y="983.92438" />
@@ -73,62 +73,62 @@
        id="g4142"
        style="opacity:1;fill:#fff6d5;stroke:none;stroke-width:8.10000038;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        inkscape:perspectiveID="#perspective4140"
-       inkscape:corner0="0.47029131 : 0.24453569 : 0 : 1"
-       inkscape:corner7="0.16737868 : 0.20057888 : 0.3001442 : 1">
+       inkscape:corner0="0.3926511 : 0.23790033 : 0 : 1"
+       inkscape:corner7="0.16737868 : 0.20057888 : 0.22855339 : 1">
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4154"
          style="fill:#e9e9ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="11"
-         d="m 159.48066,969.73206 69.41427,-8.0611 0,29.95306 -69.41427,2.93628 z"
-         points="228.89493,961.67096 228.89493,991.62402 159.48066,994.5603 159.48066,969.73206 " />
+         d="m 111.68479,969.8729 53.96292,-6.22203 0,26.73586 -53.96292,2.50698 z"
+         points="165.64771,963.65087 165.64771,990.38673 111.68479,992.89371 111.68479,969.8729 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4144"
          style="fill:#353564;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="6"
-         d="m 76.23211,961.75967 0,29.89667 83.24855,2.90396 0,-24.82824 z"
-         points="76.23211,991.65634 159.48066,994.5603 159.48066,969.73206 76.23211,961.75967 " />
+         d="m 44.446392,963.54538 0,26.79885 67.238398,2.54948 0,-23.02081 z"
+         points="44.446392,990.34423 111.68479,992.89371 111.68479,969.8729 44.446392,963.54538 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4146"
          style="fill:#4d4d9f;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="5"
-         d="m 76.23211,961.75967 65.65992,-12.20236 87.0029,12.11365 -69.41427,8.0611 z"
-         points="141.89203,949.55731 228.89493,961.67096 159.48066,969.73206 76.23211,961.75967 " />
+         d="m 44.446392,963.54538 51.552773,-8.66124 69.648545,8.76673 -53.96292,6.22203 z"
+         points="95.999165,954.88414 165.64771,963.65087 111.68479,969.8729 44.446392,963.54538 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4152"
          style="fill:#afafde;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="13"
-         d="m 76.23211,991.65634 65.65992,-4.44475 87.0029,4.41243 -69.41427,2.93628 z"
-         points="141.89203,987.21159 228.89493,991.62402 159.48066,994.5603 76.23211,991.65634 " />
+         d="m 44.446392,990.34423 51.552773,-3.48979 69.648545,3.53229 -53.96292,2.50698 z"
+         points="95.999165,986.85444 165.64771,990.38673 111.68479,992.89371 44.446392,990.34423 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4150"
          style="fill:#d7d7ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="14"
-         d="m 141.89203,949.55731 0,37.65428 87.0029,4.41243 0,-29.95306 z"
-         points="141.89203,987.21159 228.89493,991.62402 228.89493,961.67096 141.89203,949.55731 " />
+         d="m 95.999165,954.88414 0,31.9703 69.648545,3.53229 0,-26.73586 z"
+         points="95.999165,986.85444 165.64771,990.38673 165.64771,963.65087 95.999165,954.88414 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4148"
          style="fill:#8686bf;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="3"
-         d="m 76.23211,961.75967 65.65992,-12.20236 0,37.65428 -65.65992,4.44475 z"
-         points="141.89203,949.55731 141.89203,987.21159 76.23211,991.65634 76.23211,961.75967 " />
+         d="m 44.446392,963.54538 51.552773,-8.66124 0,31.9703 -51.552773,3.48979 z"
+         points="95.999165,954.88414 95.999165,986.85444 44.446392,990.34423 44.446392,963.54538 " />
     </g>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:23.03827095px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="79.651688"
-       y="982.67676"
+       x="45.223118"
+       y="983.21246"
        id="text4136"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4138"
-         x="79.651688"
-         y="982.67676"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Arial Rounded MT Bold';-inkscape-font-specification:'Arial Rounded MT Bold, '">LogicCreator</tspan></text>
+         x="45.223118"
+         y="983.21246"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:condensed;font-family:Arial;-inkscape-font-specification:'Arial Bold Condensed'">LogicCreator</tspan></text>
   </g>
 </svg>

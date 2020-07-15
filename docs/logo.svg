@@ -20,10 +20,10 @@
      id="defs4">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="-176.30602 : 43.576486 : 1"
+       inkscape:vp_x="-176.8111 : 43.576486 : 1"
        inkscape:vp_y="0 : 999.99993 : 0"
-       inkscape:vp_z="567.78844 : 43.576486 : 1"
-       inkscape:persp3d-origin="195.74121 : -131.81721 : 1"
+       inkscape:vp_z="567.28336 : 43.576486 : 1"
+       inkscape:persp3d-origin="195.23613 : -131.81721 : 1"
        id="perspective4140" />
   </defs>
   <sodipodi:namedview
@@ -33,9 +33,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
-     inkscape:cx="243.91989"
-     inkscape:cy="77.941986"
+     inkscape:zoom="1.979899"
+     inkscape:cx="-301.49291"
+     inkscape:cy="327.72465"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -73,62 +73,62 @@
        id="g4142"
        style="opacity:1;fill:#fff6d5;stroke:none;stroke-width:8.10000038;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        inkscape:perspectiveID="#perspective4140"
-       inkscape:corner0="0.7707114 : 0.25965398 : 0 : 1"
-       inkscape:corner7="0.16737868 : 0.19085023 : 0.25 : 1">
+       inkscape:corner0="0.47029131 : 0.24453569 : 0 : 1"
+       inkscape:corner7="0.16737868 : 0.20057888 : 0.3001442 : 1">
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4154"
          style="fill:#e9e9ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="11"
-         d="m 99.869415,967.08739 117.559045,-17.74964 0,48.54296 -117.559045,3.25599 z"
-         points="217.42846,949.33775 217.42846,997.88071 99.869415,1001.1367 99.869415,967.08739 " />
+         d="m 159.48066,969.73206 69.41427,-8.0611 0,29.95306 -69.41427,2.93628 z"
+         points="228.89493,961.67096 228.89493,991.62402 159.48066,994.5603 159.48066,969.73206 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4144"
          style="fill:#353564;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="6"
-         d="m 33.805708,961.20017 0,38.85653 66.063707,1.08 0,-34.04931 z"
-         points="33.805708,1000.0567 99.869415,1001.1367 99.869415,967.08739 33.805708,961.20017 " />
+         d="m 76.23211,961.75967 0,29.89667 83.24855,2.90396 0,-24.82824 z"
+         points="76.23211,991.65634 159.48066,994.5603 159.48066,969.73206 76.23211,961.75967 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4146"
          style="fill:#4d4d9f;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="5"
-         d="M 33.805708,961.20017 142.39711,936.60668 217.42846,949.33775 99.869415,967.08739 Z"
-         points="142.39711,936.60668 217.42846,949.33775 99.869415,967.08739 33.805708,961.20017 " />
+         d="m 76.23211,961.75967 65.65992,-12.20236 87.0029,12.11365 -69.41427,8.0611 z"
+         points="141.89203,949.55731 228.89493,961.67096 159.48066,969.73206 76.23211,961.75967 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4152"
          style="fill:#afafde;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="13"
-         d="m 33.805708,1000.0567 108.591402,-4.51135 75.03135,2.33536 -117.559045,3.25599 z"
-         points="142.39711,995.54535 217.42846,997.88071 99.869415,1001.1367 33.805708,1000.0567 " />
+         d="m 76.23211,991.65634 65.65992,-4.44475 87.0029,4.41243 -69.41427,2.93628 z"
+         points="141.89203,987.21159 228.89493,991.62402 159.48066,994.5603 76.23211,991.65634 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4150"
          style="fill:#d7d7ff;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="14"
-         d="m 142.39711,936.60668 0,58.93867 75.03135,2.33536 0,-48.54296 z"
-         points="142.39711,995.54535 217.42846,997.88071 217.42846,949.33775 142.39711,936.60668 " />
+         d="m 141.89203,949.55731 0,37.65428 87.0029,4.41243 0,-29.95306 z"
+         points="141.89203,987.21159 228.89493,991.62402 228.89493,961.67096 141.89203,949.55731 " />
       <path
          sodipodi:type="inkscape:box3dside"
          id="path4148"
          style="fill:#8686bf;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:round;stroke-opacity:1"
          inkscape:box3dsidetype="3"
-         d="m 33.805708,961.20017 108.591402,-24.59349 0,58.93867 -108.591402,4.51135 z"
-         points="142.39711,936.60668 142.39711,995.54535 33.805708,1000.0567 33.805708,961.20017 " />
+         d="m 76.23211,961.75967 65.65992,-12.20236 0,37.65428 -65.65992,4.44475 z"
+         points="141.89203,949.55731 141.89203,987.21159 76.23211,991.65634 76.23211,961.75967 " />
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="91.760765"
-       y="983.66119"
+       style="font-style:normal;font-weight:normal;font-size:23.03827095px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="79.651688"
+       y="982.67676"
        id="text4136"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4138"
-         x="91.760765"
-         y="983.66119"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-family:'Niagara Solid';-inkscape-font-specification:'Niagara Solid Condensed'">LogicCreator</tspan></text>
+         x="79.651688"
+         y="982.67676"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Arial Rounded MT Bold';-inkscape-font-specification:'Arial Rounded MT Bold, '">LogicCreator</tspan></text>
   </g>
 </svg>

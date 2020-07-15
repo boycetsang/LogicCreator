@@ -1,5 +1,4 @@
 # LogicCreator
-![](https://github.com/boycetsang/LogicCreator/blob/master/docs/logo.svg)  
 This is a Python-based simple day trading backtester that allow users to customize their entrance/exit long/short logics based on the movement of the same day. It also comes with an optimizer to fine-tune logic parameters. 
 * This works only under Linux environments, but today Linux subsystem ([WSL](https://docs.microsoft.com/en-us/learn/modules/get-started-with-windows-subsystem-for-linux/)) is very accessible in Windows. This is also where I developed and tested the code.
 

@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/boycetsang/LogicCreator/f77b2cfbe72673ca8f58f01ae295e8db5a8f08f1/docs/logo.svg)  
+# LogicCreator
 This is a Python-based simple day trading backtester that allow users to customize their entrance/exit long/short logics based on the movement of the same day. It also comes with an optimizer to fine-tune logic parameters. 
 * This works only under Linux environments, but today Linux subsystem ([WSL](https://docs.microsoft.com/en-us/learn/modules/get-started-with-windows-subsystem-for-linux/)) is very accessible in Windows. This is also where I developed and tested the code.
 
@@ -75,8 +75,8 @@ If needed, this function can be used to calculate quantities that are used throu
 This function is called when a position is opened/closed, but not due to this logic.
 
 #### printOnSecondAxis(self, ax):
-Only the last logic module that has this function will be effective. This function allow a secondary axis plot on the graph output. Here is an example
-![Graph Example](https://github.com/boycetsang/LogicCreator/blob/master/docs/graph_example.png)
+Only the last logic module that has this function will be effective. This function allow a secondary axis plot on the graph output. Here is an example  
+<img src="https://github.com/boycetsang/LogicCreator/blob/master/docs/graph_example.png" width="500">
 
 ## Searching for strategies with optimal logic parameters
 Instead of manually searching for a best strategy, you can also use the python package `deap` to search for a few optimal solutions and inspect only those solution.

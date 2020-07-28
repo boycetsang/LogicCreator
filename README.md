@@ -94,4 +94,4 @@ Then, execute the optimizer by
 You can then change a few things before launching the optimizer. You will see backtesting runs as extra directory in the current location. 
 
 ## Cross-validating optimized strategy
-THe optimizer can almost always find good in-sample solution - that's why it is a good idea to use a different dataset (e.g. different date range) to challenge the selected strategy. This can be done by the same script, but using the verification option in command line menu.
+The optimizer can almost always find good in-sample solution - that's why it is a good idea to use a different dataset (e.g. different date range) to challenge the selected strategy. This can be done by the same script, but using the verification option in command line menu.

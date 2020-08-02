@@ -1,7 +1,7 @@
 # LogicCreator
 This is a Python-based simple day trading backtester that allow users to customize their entrance/exit long/short logics based on the movement of the same day. It also comes with an optimizer to fine-tune logic parameters. 
 * This works only under Linux environments, but today Linux subsystem ([WSL](https://docs.microsoft.com/en-us/learn/modules/get-started-with-windows-subsystem-for-linux/)) is very accessible in Windows. This is also where I developed and tested the code.
-See this page for (how to set up a WSL2 VNC server)[https://github.com/boycetsang/wsl2-vnc].
+See this page for [how to set up a WSL2 VNC server](https://github.com/boycetsang/wsl2-vnc).
 
 ## Getting Started
 ### Setting up Repo and Python virtual environment
